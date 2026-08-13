@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Plaza — Tiong Bahru Plaza Food Directory</title>
+<style>
+  :root {
+    --ink: #1c1c1e;
+    --sub: #6b6b70;
+    --line: #e6e6e8;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --accent: #0a7d5c;
+    --accent-soft: #e5f4ee;
+    --halal: #b3822c;
+    --halal-soft: #fbf1de;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 24px 16px;
+  }
+  .header-inner { max-width: 1080px; margin: 0 auto; }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 2px;
+    letter-spacing: -0.02em;
+  }
+  .tagline { color: var(--sub); font-size: 13px; margin: 0 0 16px; }
+  .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-wrap {
+    flex: 1 1 260px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .search-wrap input:focus { outline: none; border-color: var(--accent); background: var(--card); }
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sub);
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .halal-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    background: var(--bg);
+    white-space: nowrap;
+  }
+  .halal-toggle.active {
+    background: var(--halal-soft);
+    border-color: var(--halal);
+    color: var(--halal);
+    font-weight: 600;
+  }
+  .halal-toggle input { accent-color: var(--halal); width: 15px; height: 15px; }
+  .cuisine-select {
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .result-count {
+    color: var(--sub);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .category-block { margin-bottom: 32px; }
+  .category-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sub);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .stall-name { font-size: 15px; font-weight: 600; margin: 0; line-height: 1.3; }
+  .halal-badge {
+    flex-shrink: 0;
+    background: var(--halal-soft);
+    color: var(--halal);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .stall-unit {
+    font-size: 13px;
+    color: var(--sub);
+    margin: 0;
+  }
+  .stall-cuisine {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 3px 9px;
+    border-radius: 20px;
+    width: fit-content;
+    font-weight: 600;
+  }
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn:active { opacity: 0.7; }
+  .btn-call {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .btn-web {
+    background: var(--card);
+    color: var(--ink);
+  }
+  .no-action {
+    font-size: 12px;
+    color: var(--sub);
+    padding: 8px 0 0;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--sub);
+  }
+  footer {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 12px 24px 40px;
+    color: var(--sub);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>🍽️ Food Plaza</h1>
+    <p class="tagline">Your food directory for Tiong Bahru Plaza</p>
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search stall name or cuisine...">
+      </div>
+      <select id="cuisineSelect" class="cuisine-select">
+        <option value="">All Cuisines</option>
+      </select>
+      <label class="halal-toggle" id="halalToggleLabel">
+        <input type="checkbox" id="halalToggle">
+        <span>Halal Only</span>
+      </label>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="result-count" id="resultCount"></div>
+  <div id="results"></div>
+</main>
+
+<footer>
+  Stall information (unit numbers, halal status, contact) compiled from public sources including the mall's official store listing and food review publications, and may change without notice. Please call ahead to confirm reservations, halal status, and opening hours before visiting.
+</footer>
+
+<script>
+  const stalls = [
+    { name: "Dapur Penyet", unit: "#02-137", cuisine: "Indonesian", halal: true, phone: null, reservation: false, website: "https://www.dapurpenyet.com.sg/" },
+    { name: "Sakon Thai Village", unit: "#02-135", cuisine: "Thai", halal: true, phone: "+6589099940", reservation: true, website: "https://www.facebook.com/ilovesakonthai/" },
+    { name: "Super Makan Asia", unit: "#B1-136", cuisine: "Local Singaporean", halal: true, phone: "+6598388297", reservation: false, website: "https://www.facebook.com/supermakanasia/" },
+    { name: "PastaGo", unit: "#B1-123", cuisine: "Italian & Western", halal: true, phone: null, reservation: false, website: "https://www.pastago.sg" },
+    { name: "Ajisen Ramen", unit: "#02-133", cuisine: "Japanese", halal: true, phone: null, reservation: false, website: null },
+    { name: "McDonald's", unit: "#01-145/146/147", cuisine: "Fast Food", halal: true, phone: null, reservation: false, website: null },
+    { name: "KFC", unit: "#B1-133/134", cuisine: "Fast Food", halal: true, phone: null, reservation: false, website: null },
+    { name: "Paik's Noodle", unit: "#02-136", cuisine: "Korean", halal: false, phone: "+6560275872", reservation: false, website: "https://www.instagram.com/paiks.noodlesg" },
+    { name: "Lee Lai Jiak", unit: "#02-105", cuisine: "Taiwanese", halal: false, phone: "+6565184519", reservation: true, website: "https://www.facebook.com/leelaijiak/" },
+    { name: "Tonkatsu by Ma Maison", unit: "#01-109", cuisine: "Japanese", halal: false, phone: "+6562521512", reservation: true, website: "http://www.ma-maison.sg/restaurant/tiongbahru/index.html" },
+    { name: "Zuya Vegetarian", unit: "#02-111A", cuisine: "Vegetarian", halal: false, phone: null, reservation: false, website: "https://www.kazuyasg.com/" },
+    { name: "A-One Signature", unit: "#02-134", cuisine: "Chinese", halal: false, phone: "+6562507668", reservation: true, website: "https://aonegroup.sg/" },
+    { name: "Lead General Hot Pot", unit: "#02-117", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null },
+    { name: "Du Du Dumplings", unit: "#02-111", cuisine: "Chinese", halal: false, phone: null, reservation: false, website: null },
+    { name: "Ramen Hitoyoshi", unit: "#02-138", cuisine: "Japanese", halal: false, phone: "+6562261289", reservation: false, website: null },
+    { name: "Gong Yuan Ma La Tang", unit: "#02-113", cuisine: "Chinese", halal: false, phone: null, reservation: false, website: null },
+    { name: "Shi Li Fang Hotpot", unit: "#02-112", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null },
+    { name: "Sushiro", unit: "#02-118", cuisine: "Japanese", halal: false, phone: null, reservation: false, website: null },
+    { name: "Sushi Tei", unit: "#03-110", cuisine: "Japanese", halal: false, phone: null, reservation: true, website: null },
+    { name: "Jia Li Seafood Soup", unit: "#B1-135", cuisine: "Local Singaporean", halal: false, phone: null, reservation: false, website: null },
+    { name: "Putien Mama", unit: "#02-114", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null },
+    { name: "Paris Baguette", unit: "#01-148/149/150", cuisine: "Bakery & Cafe", halal: false, phone: null, reservation: false, website: null }
+  ];
+
+  const searchInput = document.getElementById('searchInput');
+  const halalToggle = document.getElementById('halalToggle');
+  const halalToggleLabel = document.getElementById('halalToggleLabel');
+  const cuisineSelect = document.getElementById('cuisineSelect');
+  const resultsEl = document.getElementById('results');
+  const resultCountEl = document.getElementById('resultCount');
+
+  // Populate cuisine dropdown
+  const cuisines = [...new Set(stalls.map(s => s.cuisine))].sort();
+  cuisines.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    cuisineSelect.appendChild(opt);
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function render() {
+    const query = searchInput.value.trim().toLowerCase();
+    const halalOnly = halalToggle.checked;
+    const cuisineFilter = cuisineSelect.value;
+
+    halalToggleLabel.classList.toggle('active', halalOnly);
+
+    const filtered = stalls.filter(s => {
+      const matchesQuery = !query || s.name.toLowerCase().includes(query) || s.cuisine.toLowerCase().includes(query);
+      const matchesHalal = !halalOnly || s.halal;
+      const matchesCuisine = !cuisineFilter || s.cuisine === cuisineFilter;
+      return matchesQuery && matchesHalal && matchesCuisine;
+    });
+
+    resultCountEl.textContent = filtered.length + (filtered.length === 1 ? ' stall found' : ' stalls found');
+
+    if (filtered.length === 0) {
+      resultsEl.innerHTML = '<div class="empty-state">No stalls match your search. Try a different term or clear the filters.</div>';
+      return;
+    }
+
+    // Group by cuisine, preserving overall cuisine alphabetical order
+    const grouped = {};
+    filtered.forEach(s => {
+      if (!grouped[s.cuisine]) grouped[s.cuisine] = [];
+      grouped[s.cuisine].push(s);
+    });
+
+    const sortedCuisines = Object.keys(grouped).sort();
+
+    resultsEl.innerHTML = sortedCuisines.map(cuisine => {
+      const items = grouped[cuisine].sort((a, b) => a.name.localeCompare(b.name));
+      const cards = items.map(s => {
+        const halalBadge = s.halal ? '<span class="halal-badge">HALAL</span>' : '';
+        let actions = '';
+        if (s.reservation && s.phone) {
+          actions += `<a class="btn btn-call" href="tel:${s.phone}">📞 Reserve: ${s.unit}</a>`;
+        } else if (s.reservation && !s.phone) {
+          actions += `<a class="btn btn-call" href="#" onclick="return false;" title="Call ${s.unit} directly">📞 ${s.unit} to Reserve</a>`;
+        }
+        if (s.website) {
+          actions += `<a class="btn btn-web" href="${s.website}" target="_blank" rel="noopener">🍜 Menu</a>`;
+        }
+        const actionsHtml = actions ? `<div class="card-actions">${actions}</div>` : `<p class="no-action">Walk-in only · No reservation needed</p>`;
+
+        return `
+          <div class="card">
+            <div class="card-top">
+              <p class="stall-name">${escapeHtml(s.name)}</p>
+              ${halalBadge}
+            </div>
+            <p class="stall-unit">Stall ${escapeHtml(s.unit)}</p>
+            <span class="stall-cuisine">${escapeHtml(s.cuisine)}</span>
+            ${actionsHtml}
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="category-block">
+          <h2 class="category-title">${escapeHtml(cuisine)} (${items.length})</h2>
+          <div class="grid">${cards}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  searchInput.addEventListener('input', render);
+  halalToggle.addEventListener('change', render);
+  cuisineSelect.addEventListener('change', render);
+
+  render();
+</script>
+
+</body>
+</html>
