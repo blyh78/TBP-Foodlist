@@ -16,6 +16,9 @@
     --accent-soft: #e5f4ee;
     --halal: #b3822c;
     --halal-soft: #fbf1de;
+    --grab: #00b14f;
+    --grab-soft: #e5f8ed;
+    --star: #d99a1b;
     --radius: 12px;
   }
   * { box-sizing: border-box; }
@@ -153,10 +156,19 @@
     gap: 8px;
   }
   .stall-name { font-size: 15px; font-weight: 600; margin: 0; line-height: 1.3; }
+  .badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
   .halal-badge {
-    flex-shrink: 0;
     background: var(--halal-soft);
     color: var(--halal);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .grab-badge {
+    background: var(--grab-soft);
+    color: var(--grab);
     font-size: 11px;
     font-weight: 700;
     padding: 3px 8px;
@@ -168,6 +180,12 @@
     color: var(--sub);
     margin: 0;
   }
+  .stall-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
   .stall-cuisine {
     display: inline-block;
     font-size: 11px;
@@ -178,17 +196,29 @@
     width: fit-content;
     font-weight: 600;
   }
+  .review-link {
+    font-size: 12px;
+    color: var(--star);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .review-link:hover { text-decoration: underline; }
   .card-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 6px;
   }
   .btn {
-    flex: 1;
+    flex: 1 1 45%;
+    min-width: 108px;
     text-align: center;
-    padding: 8px 10px;
+    padding: 8px 8px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     text-decoration: none;
     border: 1px solid var(--line);
@@ -205,10 +235,15 @@
     background: var(--card);
     color: var(--ink);
   }
+  .btn-grab {
+    background: var(--grab);
+    color: #fff;
+    border-color: var(--grab);
+  }
   .no-action {
     font-size: 12px;
     color: var(--sub);
-    padding: 8px 0 0;
+    padding: 4px 0 0;
   }
   .empty-state {
     text-align: center;
@@ -369,7 +404,7 @@
 </main>
 
 <footer>
-  Stall information (unit numbers, halal status, contact) compiled from public sources including the mall's official store listing and food review publications, and may change without notice. Please call ahead to confirm reservations, halal status, and opening hours before visiting.
+  Stall information (unit numbers, halal status, contact) compiled from public sources including the mall's official store listing and food review publications, and may change without notice. Google Review buttons open a live Google Maps search for that stall rather than a fixed score, so you always see current ratings. GrabFood buttons open a live search on GrabFood for that stall's name, since deep links to individual restaurant pages change often. Please call ahead to confirm reservations, halal status, and opening hours before visiting.
 </footer>
 
 <!-- Spin the wheel modal -->
@@ -390,28 +425,34 @@
 
 <script>
   const stalls = [
-    { name: "Dapur Penyet", unit: "#02-137", cuisine: "Indonesian", halal: true, phone: null, reservation: false, website: "https://www.dapurpenyet.com.sg/" },
-    { name: "Sakon Thai Village", unit: "#02-135", cuisine: "Thai", halal: true, phone: "+6589099940", reservation: true, website: "https://www.facebook.com/ilovesakonthai/" },
-    { name: "Super Makan Asia", unit: "#B1-136", cuisine: "Local Singaporean", halal: true, phone: "+6598388297", reservation: false, website: "https://www.facebook.com/supermakanasia/" },
-    { name: "PastaGo", unit: "#B1-123", cuisine: "Italian & Western", halal: true, phone: null, reservation: false, website: "https://www.pastago.sg" },
-    { name: "Ajisen Ramen", unit: "#02-133", cuisine: "Japanese", halal: true, phone: null, reservation: false, website: null },
-    { name: "McDonald's", unit: "#01-145/146/147", cuisine: "Fast Food", halal: true, phone: null, reservation: false, website: null },
-    { name: "KFC", unit: "#B1-133/134", cuisine: "Fast Food", halal: true, phone: null, reservation: false, website: null },
-    { name: "Paik's Noodle", unit: "#02-136", cuisine: "Korean", halal: false, phone: "+6560275872", reservation: false, website: "https://www.instagram.com/paiks.noodlesg" },
-    { name: "Lee Lai Jiak", unit: "#02-105", cuisine: "Taiwanese", halal: false, phone: "+6565184519", reservation: true, website: "https://www.facebook.com/leelaijiak/" },
-    { name: "Tonkatsu by Ma Maison", unit: "#01-109", cuisine: "Japanese", halal: false, phone: "+6562521512", reservation: true, website: "http://www.ma-maison.sg/restaurant/tiongbahru/index.html" },
-    { name: "Zuya Vegetarian", unit: "#02-111A", cuisine: "Vegetarian", halal: false, phone: null, reservation: false, website: "https://www.kazuyasg.com/" },
-    { name: "A-One Signature", unit: "#02-134", cuisine: "Chinese", halal: false, phone: "+6562507668", reservation: true, website: "https://aonegroup.sg/" },
-    { name: "Lead General Hot Pot", unit: "#02-117", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null },
-    { name: "Du Du Dumplings", unit: "#02-111", cuisine: "Chinese", halal: false, phone: null, reservation: false, website: null },
-    { name: "Ramen Hitoyoshi", unit: "#02-138", cuisine: "Japanese", halal: false, phone: "+6562261289", reservation: false, website: null },
-    { name: "Gong Yuan Ma La Tang", unit: "#02-113", cuisine: "Chinese", halal: false, phone: null, reservation: false, website: null },
-    { name: "Shi Li Fang Hotpot", unit: "#02-112", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null },
-    { name: "Sushiro", unit: "#02-118", cuisine: "Japanese", halal: false, phone: null, reservation: false, website: null },
-    { name: "Sushi Tei", unit: "#03-110", cuisine: "Japanese", halal: false, phone: null, reservation: true, website: null },
-    { name: "Jia Li Seafood Soup", unit: "#B1-135", cuisine: "Local Singaporean", halal: false, phone: null, reservation: false, website: null },
-    { name: "Putien Mama", unit: "#02-114", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null },
-    { name: "Paris Baguette", unit: "#01-148/149/150", cuisine: "Bakery & Cafe", halal: false, phone: null, reservation: false, website: null }
+    { name: "Dapur Penyet", unit: "#02-137", cuisine: "Indonesian", halal: true, phone: null, reservation: false, website: "https://www.dapurpenyet.com.sg/", grabFood: true },
+    { name: "Sakon Thai Village", unit: "#02-135", cuisine: "Thai", halal: true, phone: "+6589099940", reservation: true, website: "https://www.facebook.com/ilovesakonthai/", grabFood: true },
+    { name: "Super Makan Asia", unit: "#B1-136", cuisine: "Local Singaporean", halal: true, phone: "+6598388297", reservation: false, website: "https://www.facebook.com/supermakanasia/", grabFood: true },
+    { name: "PastaGo", unit: "#B1-123", cuisine: "Italian & Western", halal: true, phone: null, reservation: false, website: "https://www.pastago.sg", grabFood: true },
+    { name: "Ajisen Ramen", unit: "#02-133", cuisine: "Japanese", halal: true, phone: null, reservation: false, website: null, grabFood: true },
+    { name: "McDonald's", unit: "#01-145/146/147", cuisine: "Fast Food", halal: true, phone: null, reservation: false, website: null, grabFood: true },
+    { name: "KFC", unit: "#B1-133/134", cuisine: "Fast Food", halal: true, phone: null, reservation: false, website: null, grabFood: true },
+    { name: "Paik's Noodle", unit: "#02-136", cuisine: "Korean", halal: false, phone: "+6560275872", reservation: false, website: "https://www.instagram.com/paiks.noodlesg", grabFood: true },
+    { name: "Lee Lai Jiak", unit: "#02-105", cuisine: "Taiwanese", halal: false, phone: "+6565184519", reservation: true, website: "https://www.facebook.com/leelaijiak/", grabFood: true },
+    { name: "Tonkatsu by Ma Maison", unit: "#01-109", cuisine: "Japanese", halal: false, phone: "+6562521512", reservation: true, website: "http://www.ma-maison.sg/restaurant/tiongbahru/index.html", grabFood: true },
+    { name: "Zuya Vegetarian", unit: "#02-111A", cuisine: "Vegetarian", halal: false, phone: null, reservation: false, website: "https://www.kazuyasg.com/", grabFood: false },
+    { name: "A-One Signature", unit: "#02-134", cuisine: "Chinese", halal: false, phone: "+6562507668", reservation: true, website: "https://aonegroup.sg/", grabFood: true },
+    { name: "Lead General Hot Pot", unit: "#02-117", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null, grabFood: false },
+    { name: "Du Du Dumplings", unit: "#02-111", cuisine: "Chinese", halal: false, phone: null, reservation: false, website: null, grabFood: true },
+    { name: "Ramen Hitoyoshi", unit: "#02-138", cuisine: "Japanese", halal: false, phone: "+6562261289", reservation: false, website: null, grabFood: true },
+    { name: "Gong Yuan Ma La Tang", unit: "#02-113", cuisine: "Chinese", halal: false, phone: null, reservation: false, website: null, grabFood: true },
+    { name: "Shi Li Fang Hotpot", unit: "#02-112", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null, grabFood: false },
+    { name: "Sushiro", unit: "#02-118", cuisine: "Japanese", halal: false, phone: null, reservation: false, website: null, grabFood: false },
+    { name: "Sushi Tei", unit: "#03-110", cuisine: "Japanese", halal: false, phone: null, reservation: true, website: null, grabFood: true },
+    { name: "Jia Li Seafood Soup", unit: "#B1-135", cuisine: "Local Singaporean", halal: false, phone: null, reservation: false, website: null, grabFood: false },
+    { name: "Putien Mama", unit: "#02-114", cuisine: "Chinese", halal: false, phone: null, reservation: true, website: null, grabFood: true },
+    { name: "Paris Baguette", unit: "#01-148/149/150", cuisine: "Bakery & Cafe", halal: false, phone: null, reservation: false, website: null, grabFood: true },
+    // Beverages
+    { name: "LiHO Tea", unit: "#B1-K9", cuisine: "Beverages", halal: true, phone: "+6560275848", reservation: false, website: "https://www.lihotea.com/", grabFood: true },
+    { name: "KOI Thé", unit: "#01-155", cuisine: "Beverages", halal: true, phone: null, reservation: false, website: "https://koithe.com.sg/", grabFood: true },
+    { name: "Mr. Coconut", unit: "#01-153", cuisine: "Beverages", halal: true, phone: null, reservation: false, website: "https://mrcoconut.sg/", grabFood: true },
+    { name: "PlayMade", unit: "#01-154", cuisine: "Beverages", halal: true, phone: null, reservation: false, website: null, grabFood: true },
+    { name: "Boost Juice Bars", unit: "#B1-121", cuisine: "Beverages", halal: true, phone: null, reservation: false, website: null, grabFood: true }
   ];
 
   const searchInput = document.getElementById('searchInput');
@@ -423,7 +464,6 @@
 
   let currentFiltered = [...stalls];
 
-  // Populate cuisine dropdown
   const cuisines = [...new Set(stalls.map(s => s.cuisine))].sort();
   cuisines.forEach(c => {
     const opt = document.createElement('option');
@@ -438,8 +478,20 @@
     return div.innerHTML;
   }
 
+  function googleReviewUrl(s) {
+    const q = encodeURIComponent(s.name + " Tiong Bahru Plaza Singapore");
+    return `https://www.google.com/maps/search/?api=1&query=${q}`;
+  }
+
+  function grabFoodUrl(s) {
+    const q = encodeURIComponent(s.name);
+    return `https://food.grab.com/sg/en/restaurants?search=${q}`;
+  }
+
   function cardHtml(s) {
     const halalBadge = s.halal ? '<span class="halal-badge">HALAL</span>' : '';
+    const grabBadge = s.grabFood ? '<span class="grab-badge">GRAB</span>' : '';
+
     let actions = '';
     if (s.reservation && s.phone) {
       actions += `<a class="btn btn-call" href="tel:${s.phone}">📞 Reserve: ${s.unit}</a>`;
@@ -449,16 +501,22 @@
     if (s.website) {
       actions += `<a class="btn btn-web" href="${s.website}" target="_blank" rel="noopener">🍜 Menu</a>`;
     }
-    const actionsHtml = actions ? `<div class="card-actions">${actions}</div>` : `<p class="no-action">Walk-in only · No reservation needed</p>`;
+    if (s.grabFood) {
+      actions += `<a class="btn btn-grab" href="${grabFoodUrl(s)}" target="_blank" rel="noopener">🛵 Order on Grab</a>`;
+    }
+    const actionsHtml = actions ? `<div class="card-actions">${actions}</div>` : `<p class="no-action">Walk-in only · No reservation or delivery listed</p>`;
 
     return `
       <div class="card">
         <div class="card-top">
           <p class="stall-name">${escapeHtml(s.name)}</p>
-          ${halalBadge}
+          <div class="badges">${halalBadge}${grabBadge}</div>
         </div>
         <p class="stall-unit">Stall ${escapeHtml(s.unit)}</p>
-        <span class="stall-cuisine">${escapeHtml(s.cuisine)}</span>
+        <div class="stall-meta-row">
+          <span class="stall-cuisine">${escapeHtml(s.cuisine)}</span>
+          <a class="review-link" href="${googleReviewUrl(s)}" target="_blank" rel="noopener">⭐ Google Reviews</a>
+        </div>
         ${actionsHtml}
       </div>
     `;
@@ -531,7 +589,6 @@
 
   function pickWheelStalls() {
     let list = currentFiltered.length >= 2 ? currentFiltered : stalls;
-    // Cap to a reasonable number of segments for readability
     if (list.length > 12) {
       list = [...list].sort(() => 0.5 - Math.random()).slice(0, 12);
     }
@@ -597,7 +654,7 @@
     const segAngle = 360 / n;
     const targetIndex = Math.floor(Math.random() * n);
     const centerAngleDeg = (targetIndex * segAngle + segAngle / 2);
-    const pointerAngleDeg = 270; // top of canvas in canvas-angle terms (0 = 3 o'clock, clockwise)
+    const pointerAngleDeg = 270;
 
     let neededOffset = (pointerAngleDeg - centerAngleDeg) % 360;
     if (neededOffset < 0) neededOffset += 360;
